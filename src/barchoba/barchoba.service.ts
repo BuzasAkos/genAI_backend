@@ -24,12 +24,12 @@ export class BarchobaService {
 
     async getSecret() {
         const pastGames: Barchoba[] = await this.barchobaRepository.getAllGames();
-        const pastList = 'Jesus Christ, Santa Claus, ' + pastGames.map(item => item.solution).join(', ');
+        const pastList = 'Jesus Christ, Santa Claus, Albert Einstein, ' + pastGames.map(item => item.solution).join(', ');
         console.log(pastList)
         const messages: any = [
             { role: "system", content: "You are a barchoba game master, you need to specify a secret that a player will find out." },
             { role: "user", content: `Give the name of a famous person (dead or alive, real or imaginary), that everyone knows. 
-            It cannot be part of this list: ${pastList}. Answer with the name only.` }
+            It cannot be part of this list: ${pastList}. For example, select a star from film or music industry. Answer with the name only.` }
         ]
         const model = this.model;
         const temperature = 1.8;
