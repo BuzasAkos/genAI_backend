@@ -46,7 +46,7 @@ export class BarchobaService {
         const messages = [{ 
             role: "system", 
             content: `You are a barchoba game master, the player has to find out this person: ${solution}. 
-            Answer only with yes or no. Refuse answering if the user directly guesses a name or does not ask a yes or no question.` 
+            Answer only with yes or no. Refuse answering if the user directly guesses the name of the person. Answer only to yes or no questions.` 
         }];
         const active = true;
         return await this.barchobaRepository.createGame( solution, active, messages );
