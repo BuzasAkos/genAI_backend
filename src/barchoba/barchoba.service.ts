@@ -23,10 +23,10 @@ export class BarchobaService {
     }
 
     async getSecret() {
-        const pastGames: Barchoba[] = await this.barchobaRepository.getAllGames();
-        const pastList = 'Jesus Christ, Santa Claus, Albert Einstein, ' + pastGames.map(item => item.solution).join(', ');
+        const pastGames: string[] = await this.barchobaRepository.getLastSolutions(50);
+        const pastList = 'Jesus Christ, Santa Claus, Albert Einstein, ' + pastGames.join(', ');
         console.log(pastList)
-        const hint = this.getRndType(2) === 1 ? 'For example, select a star from film or music industry.' : '';
+        const hint = this.getRndHint();
         console.log(hint);
         
         const messages: any = [
@@ -35,7 +35,7 @@ export class BarchobaService {
             It cannot be part of this list: ${pastList}. ${hint} Answer with the name only.` }
         ]
         const model = this.model;
-        const temperature = 1.8;
+        const temperature = 1.9;
         const top_p = 0.9;
 
         const completion = await this.openai.chat.completions.create({ messages, model, temperature, top_p });
@@ -45,8 +45,13 @@ export class BarchobaService {
         return secret;
     }
 
-    getRndType(count: number): number {
-        return Math.floor(Math.random() * count);
+    getRndHint(): string {
+        const randomSelect = Math.floor(Math.random() * 4);
+        switch (randomSelect) {
+            case 1: return 'For example, select a star from film industry.';
+            case 2: return 'For example, select a star from music industry.';
+            default: return '';
+        }
     }
 
     async startRound(solution: string) {
@@ -54,7 +59,8 @@ export class BarchobaService {
             role: "system", 
             content: `You are a barchoba game master, the player has to find out this person: ${solution}. 
             Answer only with yes or no.
-            Guesssing the exact name of the person is not allowed, refuse it. But provide answer to any other question about the person, if it is a yes or no question.` 
+            Guesssing the exact name of the person is not allowed, in this case say that you cannot answer. 
+            But provide answer to any other question about the person, if it is a yes or no question.` 
         }];
         const active = true;
         return await this.barchobaRepository.createGame( solution, active, messages );
