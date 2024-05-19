@@ -26,10 +26,13 @@ export class BarchobaService {
         const pastGames: Barchoba[] = await this.barchobaRepository.getAllGames();
         const pastList = 'Jesus Christ, Santa Claus, Albert Einstein, ' + pastGames.map(item => item.solution).join(', ');
         console.log(pastList)
+        const hint = this.getRndType(2) === 1 ? 'For example, select a star from film or music industry.' : '';
+        console.log(hint);
+        
         const messages: any = [
             { role: "system", content: "You are a barchoba game master, you need to specify a secret that a player will find out." },
             { role: "user", content: `Give the name of a famous person (dead or alive, real or imaginary), that everyone knows. 
-            It cannot be part of this list: ${pastList}. For example, select a star from film or music industry. Answer with the name only.` }
+            It cannot be part of this list: ${pastList}. ${hint} Answer with the name only.` }
         ]
         const model = this.model;
         const temperature = 1.8;
@@ -42,11 +45,16 @@ export class BarchobaService {
         return secret;
     }
 
+    getRndType(count: number): number {
+        return Math.floor(Math.random() * count);
+    }
+
     async startRound(solution: string) {
         const messages = [{ 
             role: "system", 
             content: `You are a barchoba game master, the player has to find out this person: ${solution}. 
-            Answer only with yes or no. Refuse answering if the user directly guesses the name of the person. Answer only to yes or no questions.` 
+            Answer only with yes or no.
+            Guesssing the exact name of the person is not allowed, refuse it. But provide answer to any other question about the person, if it is a yes or no question.` 
         }];
         const active = true;
         return await this.barchobaRepository.createGame( solution, active, messages );
