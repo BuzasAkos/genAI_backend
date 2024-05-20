@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import OpenAI from 'openai';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BarchobaRepository } from './barchoba.repository';
-import { Barchoba } from './barchoba.entity';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { ChatCompletionMessageParam } from 'openai/resources';
 
 
 @Injectable()

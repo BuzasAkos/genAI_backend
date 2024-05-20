@@ -16,8 +16,7 @@ import { env } from 'process';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         type: 'mongodb',
-        url: 'mongodb+srv://akosbuzas:FNojwl3I5dKrR3dq@cluster0.4hkwfd9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
-        // url: process.env.MONGOATLAS_URL_FULL,
+        url: `${process.env.MONGOATLAS_URL}?retryWrites=true&w=majority&appName=Cluster0`,
         database: 'test',
         synchronize: true, // Set to false in production for safety reasons
         entities: [__dirname + '/**/*.entity{.ts,.js}'], // Point to entities directory
