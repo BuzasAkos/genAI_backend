@@ -55,10 +55,10 @@ export class BarchobaService {
     async startRound(solution: string) {
         const messages = [{ 
             role: "system", 
-            content: `You are a barchoba game master, the player has to find out this person: ${solution}. 
-            Answer only with yes or no.
-            Guesssing the exact name of the person is not allowed, in this case say that you cannot answer. 
-            But provide answer to any other question about the person, if it is a yes or no question.` 
+            content: `You are a barchoba game master, the player has to find out a secret person. Answer only with yes or no.
+            Guesssing the exact name of the person is not allowed (even if the user incorrectly gueses the secret person), in this case say this: "I cannot answer". 
+            But provide answer to any other yes or no question about the person: for example, about songs he/she sang, film he/she made, company he/she worked at, colleagues he/she worked with.
+            The secret person to find out is ${solution}.` 
         }];
         const active = true;
         return await this.barchobaRepository.createGame( solution, active, messages );
