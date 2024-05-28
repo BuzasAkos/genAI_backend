@@ -30,7 +30,8 @@ export class BarchobaRepository extends Repository<Barchoba> {
     async getLastSolutions(num: number): Promise<string[]> {
         const documents = await this.find();
         let solutions = documents.map(doc => doc.solution);
-        solutions = solutions.slice(solutions.length - num);
+        console.log(solutions.length);
+        solutions = solutions.slice(solutions.length - Math.min(num, solutions.length));
         return solutions;
     }
 }
