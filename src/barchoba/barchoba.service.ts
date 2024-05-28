@@ -21,8 +21,9 @@ export class BarchobaService {
     }
 
     async getSecret() {
-        const pastGames: string[] = await this.barchobaRepository.getLastSolutions(50);
-        const pastList = 'Jesus Christ, Santa Claus, Albert Einstein, ' + pastGames.join(', ');
+        let pastGames: string[] = await this.barchobaRepository.getLastSolutions(40);
+        pastGames = pastGames.reverse();
+        const pastList = 'Jesus Christ, Santa Claus, ' + pastGames.join(', ');
         console.log(pastList)
         const hint = this.getRndHint();
         console.log(hint);
