@@ -17,11 +17,12 @@ export class BarchobaService {
     ) {
         // Initialize OpenAI model
         this.openai = new OpenAI();
-        this.model = "gpt-4-turbo-preview";
+        // this.model = "gpt-4-turbo-preview";
+        this.model = "gpt-4o";
     }
 
     async getSecret() {
-        let pastGames: string[] = await this.barchobaRepository.getLastSolutions(40);
+        let pastGames: string[] = await this.barchobaRepository.getLastSolutions(50);
         pastGames = pastGames.reverse();
         const pastList = 'Jesus Christ, Santa Claus, ' + pastGames.join(', ');
         console.log(pastList)
