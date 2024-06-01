@@ -72,7 +72,8 @@ export class BarchobaService {
             role: "system", 
             content: `You are a barchoba game master, the player has to find out a secret person. Answer only with yes or no.
             Guesssing the exact name of the person is not allowed (even if the user incorrectly gueses the secret person), in this case say this: "I cannot answer". 
-            But provide answer to any other yes or no question about the person: for example, about songs he/she sang, film he/she made, company he/she worked at, colleagues he/she worked with.
+            Never reveal the name of the secret person, neither fully or partly. 
+            But provide answer to any other yes or no question about the person: for example, about songs he/she sang, film he/she made, company he/she worked at, colleagues he/she worked with, relatives or friends.
             The secret person to find out is ${solution}.` 
         }];
         const active = true;
@@ -125,9 +126,10 @@ export class BarchobaService {
         const model = this.model;
         
         game.active = false;
-        await this.barchobaRepository.updateGame(game);
 
         if (!question || question.length < 3) {
+            game.successful = false;
+            await this.barchobaRepository.updateGame(game);
             return { guess: question, solution: solution, successful: false, countQ: countQ };
         }
 
@@ -157,9 +159,13 @@ export class BarchobaService {
         console.log(answer);
 
         if ( answer.trim().includes('Yes') ) {    
+            game.successful = true;
+            await this.barchobaRepository.updateGame(game);
             return { guess: question, solution: solution, successful: true, countQ: countQ }
         }
 
+        game.successful = false;
+        await this.barchobaRepository.updateGame(game);
         return { guess: question, solution: solution, successful: false, countQ: countQ }
     }
 
