@@ -23,7 +23,8 @@ export class BarchobaRepository extends Repository<Barchoba> {
     }
 
     async createGame(solution: string, active: boolean, messages ): Promise<Barchoba> {
-        const newGame = this.create({ solution, active, messages });
+        const started = new Date();
+        const newGame = this.create({ solution, active, messages, started });
         return await this.save(newGame);
     }
 

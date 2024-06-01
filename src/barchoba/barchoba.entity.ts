@@ -6,10 +6,16 @@ export class Barchoba {
   id: string;
 
   @Column()
+  started: Date;
+  
+  @Column()
   solution: string;
 
   @Column()
   active: boolean;
+
+  @Column()
+  successful: boolean;
 
   @Column('json')
   messages: Array<{ role: string; content: string }>;

@@ -22,9 +22,10 @@ export class BarchobaService {
     }
 
     async getSecret() {
-        let pastGames: string[] = await this.barchobaRepository.getLastSolutions(50);
+        let pastGames: string[] = await this.barchobaRepository.getLastSolutions(60);
         pastGames = pastGames.reverse();
-        const pastList = 'Jesus Christ, Santa Claus, ' + pastGames.join(', ');
+        pastGames.unshift('Jesus Christ', 'Santa Claus', 'Marilyn Monroe', 'Albert Einstein');
+        const pastList = pastGames.join(', ');
         console.log(pastList)
         const hint = this.getRndHint();
         console.log(hint);
@@ -32,24 +33,36 @@ export class BarchobaService {
         const messages: any = [
             { role: "system", content: "You are a barchoba game master, you need to specify a secret that a player will find out." },
             { role: "user", content: `Give the name of a famous person (dead or alive, real or imaginary), that everyone knows. 
-            It cannot be part of this list: ${pastList}. ${hint} Answer with the name only.` }
+            The following names have already been selected previously, so do not choose any of them: ${pastList}. ${hint} Answer with the name only.` }
         ]
         const model = this.model;
         const temperature = 1.9;
-        const top_p = 0.9;
+        const top_p = 1;
 
-        const completion = await this.openai.chat.completions.create({ messages, model, temperature, top_p });
-        let secret = completion.choices[0].message.content.trim().replaceAll('.','');
-        
-        console.log(secret);
+        let attempt: number = 0;
+        let secret: string = '';
+        let secretAccepted: boolean = false;
+        while (attempt < 4 && !secretAccepted) {
+            attempt++;
+            const completion = await this.openai.chat.completions.create({ messages, model, temperature, top_p });
+            secret = completion.choices[0].message.content.trim().replaceAll('.','');
+            console.log(secret);
+            secretAccepted = pastGames.includes(secret) || !secret ? false : true;
+        };
+
         return secret;
     }
 
     getRndHint(): string {
-        const randomSelect = Math.floor(Math.random() * 4);
+        const randomSelect = Math.floor(Math.random() * 8);
         switch (randomSelect) {
             case 1: return 'For example, select a star from film industry.';
             case 2: return 'For example, select a star from music industry.';
+            case 3: return 'For example, select a famous person from history.';
+            case 4: return 'For example, select a legendary artist or scientist.';
+            case 5: return 'For example, select a popular character from a tale or a cartoon.';
+            case 6: return 'For example, select a famous person from business or political life.';
+            case 7: return 'For example, select a well-known person from Hungary.';
             default: return '';
         }
     }
@@ -59,7 +72,8 @@ export class BarchobaService {
             role: "system", 
             content: `You are a barchoba game master, the player has to find out a secret person. Answer only with yes or no.
             Guesssing the exact name of the person is not allowed (even if the user incorrectly gueses the secret person), in this case say this: "I cannot answer". 
-            But provide answer to any other yes or no question about the person: for example, about songs he/she sang, film he/she made, company he/she worked at, colleagues he/she worked with.
+            Never reveal the name of the secret person, neither fully or partly. 
+            But provide answer to any other yes or no question about the person: for example, about songs he/she sang, film he/she made, company he/she worked at, colleagues he/she worked with, relatives or friends.
             The secret person to find out is ${solution}.` 
         }];
         const active = true;
@@ -112,9 +126,10 @@ export class BarchobaService {
         const model = this.model;
         
         game.active = false;
-        await this.barchobaRepository.updateGame(game);
 
         if (!question || question.length < 3) {
+            game.successful = false;
+            await this.barchobaRepository.updateGame(game);
             return { guess: question, solution: solution, successful: false, countQ: countQ };
         }
 
@@ -144,15 +159,18 @@ export class BarchobaService {
         console.log(answer);
 
         if ( answer.trim().includes('Yes') ) {    
+            game.successful = true;
+            await this.barchobaRepository.updateGame(game);
             return { guess: question, solution: solution, successful: true, countQ: countQ }
         }
 
+        game.successful = false;
+        await this.barchobaRepository.updateGame(game);
         return { guess: question, solution: solution, successful: false, countQ: countQ }
     }
 
     async getChatHistory(id: string) {
         const game = await this.barchobaRepository.getGameById(id);
-        console.log(game);
         if (!game) {
             return null;
         }
@@ -160,6 +178,7 @@ export class BarchobaService {
             return null;  
         }
         const chatHistory = game.messages.filter((item) => item.role === 'user' || item.role === 'assistant');
+        console.log(chatHistory);
         return chatHistory;
     }
 
