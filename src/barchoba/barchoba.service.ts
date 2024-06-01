@@ -171,7 +171,6 @@ export class BarchobaService {
 
     async getChatHistory(id: string) {
         const game = await this.barchobaRepository.getGameById(id);
-        console.log(game);
         if (!game) {
             return null;
         }
@@ -179,6 +178,7 @@ export class BarchobaService {
             return null;  
         }
         const chatHistory = game.messages.filter((item) => item.role === 'user' || item.role === 'assistant');
+        console.log(chatHistory);
         return chatHistory;
     }
 
