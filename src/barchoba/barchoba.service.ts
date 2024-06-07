@@ -22,7 +22,7 @@ export class BarchobaService {
     }
 
     async getSecret() {
-        let pastGames: string[] = await this.barchobaRepository.getLastSolutions(60);
+        let pastGames: string[] = await this.barchobaRepository.getLastSolutions(80);
         pastGames = pastGames.reverse();
         pastGames.unshift('Jesus Christ', 'Santa Claus', 'Marilyn Monroe', 'Albert Einstein');
         const pastList = pastGames.join(', ');
@@ -42,7 +42,7 @@ export class BarchobaService {
         let attempt: number = 0;
         let secret: string = '';
         let secretAccepted: boolean = false;
-        while (attempt < 4 && !secretAccepted) {
+        while (attempt < 5 && !secretAccepted) {
             attempt++;
             const completion = await this.openai.chat.completions.create({ messages, model, temperature, top_p });
             secret = completion.choices[0].message.content.trim().replaceAll('.','');
@@ -54,7 +54,7 @@ export class BarchobaService {
     }
 
     getRndHint(): string {
-        const randomSelect = Math.floor(Math.random() * 8);
+        const randomSelect = Math.floor(Math.random() * 9);
         switch (randomSelect) {
             case 1: return 'For example, select a star from film industry.';
             case 2: return 'For example, select a star from music industry.';
@@ -63,6 +63,7 @@ export class BarchobaService {
             case 5: return 'For example, select a popular character from a tale or a cartoon.';
             case 6: return 'For example, select a famous person from business or political life.';
             case 7: return 'For example, select a well-known person from Hungary.';
+            case 8: return 'For example, select a popular European artist like Bud Spencer or Sophie Marceau.'
             default: return '';
         }
     }
