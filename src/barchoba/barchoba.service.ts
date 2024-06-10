@@ -22,7 +22,7 @@ export class BarchobaService {
     }
 
     async getSecret() {
-        let pastGames: string[] = await this.barchobaRepository.getLastSolutions(80);
+        let pastGames: string[] = await this.barchobaRepository.getLastSolutions(100);
         pastGames = pastGames.reverse();
         pastGames.unshift('Jesus Christ', 'Santa Claus', 'Marilyn Monroe', 'Albert Einstein');
         const pastList = pastGames.join(', ');
