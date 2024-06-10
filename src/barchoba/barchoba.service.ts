@@ -22,7 +22,7 @@ export class BarchobaService {
     }
 
     async getSecret() {
-        let pastGames: string[] = await this.barchobaRepository.getLastSolutions(80);
+        let pastGames: string[] = await this.barchobaRepository.getLastSolutions(100);
         pastGames = pastGames.reverse();
         pastGames.unshift('Jesus Christ', 'Santa Claus', 'Marilyn Monroe', 'Albert Einstein');
         const pastList = pastGames.join(', ');
@@ -84,15 +84,15 @@ export class BarchobaService {
     async sendQuestion(id: string, question: string) {
         let game = await this.barchobaRepository.getGameById(id);
         if (!game) {
-            return new HttpException('Barchoba game not found with this id', HttpStatus.NOT_FOUND);
+            throw new HttpException('Barchoba game not found with this id', HttpStatus.NOT_FOUND);
         }
 
         if ( !game.active ) {
-            return new HttpException('The specified game is not active, no more questions are accepted', HttpStatus.NOT_ACCEPTABLE);
+            throw new HttpException('The specified game is not active, no more questions are accepted', HttpStatus.NOT_ACCEPTABLE);
         }
 
         if (!question || question.length < 3) {
-            return new HttpException('Invalid question', HttpStatus.NOT_ACCEPTABLE);
+            throw new HttpException('Invalid question', HttpStatus.NOT_ACCEPTABLE);
         }
 
         game.messages.push({
@@ -102,7 +102,9 @@ export class BarchobaService {
         const messages: any = game.messages;
         const completion = await this.openai.chat.completions.create({ 
             messages: messages, 
-            model: this.model 
+            model: this.model, 
+        }).catch( (reason) => {
+            throw new HttpException(reason, HttpStatus.INTERNAL_SERVER_ERROR);
         });
         game.messages.push(completion.choices[0].message);
         console.log(question, completion.choices[0].message.content);
@@ -115,11 +117,11 @@ export class BarchobaService {
         let game = await this.barchobaRepository.getGameById(id);
 
         if (!game) {
-            return new HttpException('Barchoba game not found with this id', HttpStatus.NOT_FOUND);
+            throw new HttpException('Barchoba game not found with this id', HttpStatus.NOT_FOUND);
         }
 
         if ( !game.active ) {
-            return new HttpException('The specified game is not active, no more questions are accepted', HttpStatus.NOT_ACCEPTABLE);
+            throw new HttpException('The specified game is not active, no more questions are accepted', HttpStatus.NOT_ACCEPTABLE);
         }
 
         const countQ = game.messages.filter( (item) => item.role === 'user' ).length;
@@ -155,7 +157,10 @@ export class BarchobaService {
             }
         ];
 
-        const completion: any = await this.openai.chat.completions.create({ messages, model });
+        const completion: any = await this.openai.chat.completions.create({ messages, model })
+            .catch( (reason) => {
+                throw new HttpException(reason, HttpStatus.INTERNAL_SERVER_ERROR);
+            });
         const answer: string = completion.choices[0].message.content;
         console.log(answer);
 
