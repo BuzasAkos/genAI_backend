@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { BarchobaModule } from './barchoba/barchoba.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { env } from 'process';
+import { HostessModule } from './hostess/hostess.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { env } from 'process';
       }), 
     }),
     BarchobaModule,
+    HostessModule,
   ],
   controllers: [AppController],
   providers: [AppService],
