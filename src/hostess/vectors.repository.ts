@@ -22,8 +22,8 @@ export class VectorRepository extends Repository<Vector> {
 
     }
 
-    async getAllVectors(): Promise<Vector[]> {
-        return await this.find();
+    async getAllVectors(topicID: string): Promise<Vector[]> {
+        return await this.find({ where: { topicID } });
     }
 
 }
