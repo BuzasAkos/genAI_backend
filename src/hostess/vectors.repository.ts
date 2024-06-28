@@ -18,8 +18,8 @@ export class VectorRepository extends Repository<Vector> {
 
     }
 
-    async deleteVector() {
-
+    async deleteVector(id: string) {
+        await this.delete(id);
     }
 
     async getAllVectors(topicID: string): Promise<Vector[]> {
